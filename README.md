@@ -14,7 +14,7 @@ similr is a Python-based software that allows you to find similar images within 
 
 1. Clone the repository:
 ```
-git clone https://github.com/your-username/similr.git`
+git clone https://github.com/kamephis/similr.git`
 ```
 2. Update pip
 ```
