@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import os
 import shutil
@@ -15,7 +16,7 @@ def compare_images(imageA, imageB):
     similarity = cv2.compareHist(histA, histB, cv2.HISTCMP_CORREL)
     return similarity
 
-def find_similar_images(input_image_path, folder_path, results_folder_path):
+def find_similar_images(input_image_path, folder_path, results_folder_path, move_images=True):
     # Load the input image
     input_image = cv2.imread(input_image_path)
     if input_image is None:
@@ -51,11 +52,26 @@ def find_similar_images(input_image_path, folder_path, results_folder_path):
         similarity = compare_images(input_image, image)
         print(f"Similarity between {input_image_path} and {image_path}: {similarity}")
 
-        # If the images are similar, move the image to the results folder
+        # If the images are similar, move or copy the image to the results folder
         if similarity > 0.7:  # Adjust the threshold as needed
             destination_path = os.path.join(results_folder_path, filename)
-            shutil.move(image_path, destination_path)
-            print(f"Moved {filename} to {destination_path}")
+            if move_images:
+                shutil.move(image_path, destination_path)
+                print(f"Moved {filename} to {destination_path}")
+            else:
+                shutil.copy(image_path, destination_path)
+                print(f"Copied {filename} to {destination_path}")
 
-# Use the function
-find_similar_images("input.jpeg", "img", "results")
+if __name__ == "__main__":
+    # Create the CLI parser
+    parser = argparse.ArgumentParser(description="Find similar images based on content matching.")
+    parser.add_argument("input_image", type=str, help="Path to the input image")
+    parser.add_argument("folder_path", type=str, help="Path to the folder containing images to compare")
+    parser.add_argument("results_folder", type=str, help="Path to the results folder")
+    parser.add_argument("--copy", action="store_true", help="Copy similar images instead of moving them")
+
+    # Parse the CLI arguments
+    args = parser.parse_args()
+
+    # Use the function with the CLI parameters
+    find_similar_images(args.input_image, args.folder_path, args.results_folder, move_images=not args.copy)
